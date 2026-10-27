@@ -1,0 +1,18 @@
+{
+  "id": "test-outline",
+  "name": "Test: Selected Tab Outline",
+  "version": "0.1.0",
+  "description": "Test submission. Draws an outline around the selected tab.",
+  "options": [
+    {
+      "type": "color",
+      "pref": "color",
+      "label": "Outline color",
+      "default": "#29c5f6"
+    }
+  ],
+  "author": "ishid4",
+  "homepage": "https://github.com/ishid4/Firefox-Zen-Mods/tree/main/mods/test-outline",
+  "updateURL": "https://ishid4.github.io/Firefox-Zen-Mods/mods/test-outline/mod.json",
+  "downloadURL": "https://github.com/ishid4/Firefox-Zen-Mods/releases/download/mods/test-outline-0.1.0.zip"
+}
