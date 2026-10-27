@@ -1,0 +1,4 @@
+.tabbrowser-tab[selected] .tab-background {
+  outline: 2px solid var(--mod-test-outline-color, #29c5f6);
+  outline-offset: -2px;
+}
