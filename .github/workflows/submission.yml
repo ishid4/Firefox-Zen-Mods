@@ -1,0 +1,65 @@
+# A "Submit a mod" issue -> checks the attached zip -> a pull request adding
+# it under mods/<id>/, and a comment on the issue either way. Editing the
+# issue runs it again and updates the same pull request.
+name: Submission
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: submission-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    if: github.event.issue.state == 'open' && contains(github.event.issue.labels.*.name, 'mod-submission')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the zip
+        id: check
+        run: node scripts/submission.mjs
+        env:
+          # Untrusted: read by the script, never put in a shell command.
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+          OUT_DIR: ${{ runner.temp }}
+
+      - name: Open or update the pull request
+        if: steps.check.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+          OUT_DIR: ${{ runner.temp }}
+        run: |
+          branch="submission/$NUMBER"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add mods owners.json
+          git commit -q -F "$OUT_DIR/pr-title.txt"
+          git push -q -f origin "$branch"
+          if [ "$(gh pr list --head "$branch" --state open --json number --jq length)" = "0" ]; then
+            gh pr create --head "$branch" --base main --title "$(cat "$OUT_DIR/pr-title.txt")" --body-file "$OUT_DIR/pr-body.md"
+          else
+            gh pr edit "$branch" --title "$(cat "$OUT_DIR/pr-title.txt")" --body-file "$OUT_DIR/pr-body.md"
+          fi
+
+      - name: Comment on the issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+          OUT_DIR: ${{ runner.temp }}
+        run: |
+          [ -f "$OUT_DIR/comment.md" ] || exit 0
+          gh issue comment "$NUMBER" --edit-last --create-if-none --body-file "$OUT_DIR/comment.md"

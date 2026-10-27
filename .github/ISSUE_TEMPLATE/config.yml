@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Firefox-Zen
+    url: https://github.com/ishid4/Firefox-Zen
+    about: Problems with Firefox-Zen itself, or with making a mod, go here.

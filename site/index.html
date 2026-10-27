@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firefox-Zen Mods</title>
+  <meta name="description" content="Mods for Firefox-Zen: themes and features for Zen / Arc-style Firefox.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c5cff'/%3E%3Cpath d='M10 9h12l-12 14h12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-row">
+      <div>
+        <h1>Firefox-Zen Mods</h1>
+        <p class="lede">Themes and features for <a href="https://github.com/ishid4/Firefox-Zen">Firefox-Zen</a>, made by the community.</p>
+      </div>
+      <a class="button primary" id="submit" href="https://github.com/ishid4/Firefox-Zen-Mods/issues/new?template=submit-mod.yml">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12V3M4 7l4-4 4 4M3 13h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Submit a mod
+      </a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <details class="howto">
+      <summary>How to install a mod</summary>
+      <ol>
+        <li>Click <b>Download</b> on a mod to get its <code>.zip</code>.</li>
+        <li>In Firefox, open the Library's <b>Mods</b> tab and click <b>Install from zip…</b>.</li>
+        <li>Pick the zip. CSS-only mods turn on right away; a mod with a script asks first.</li>
+      </ol>
+      <p>Installed mods check this store for updates. Mods marked <span class="badge warn">Script</span> run with full access to Firefox: every script is reviewed before it's listed, but only install ones you trust.</p>
+    </details>
+
+    <div class="toolbar" role="search">
+      <input id="q" type="search" placeholder="Search mods" aria-label="Search mods" autocomplete="off">
+      <div class="seg" role="radiogroup" aria-label="Sort">
+        <button type="button" data-sort="popular" role="radio">Popular</button>
+        <button type="button" data-sort="updated" role="radio">Updated</button>
+        <button type="button" data-sort="new" role="radio">New</button>
+        <button type="button" data-sort="name" role="radio">A–Z</button>
+      </div>
+      <label class="check"><input id="css-only" type="checkbox"> CSS only</label>
+    </div>
+
+    <p id="status" class="status" aria-live="polite">Loading…</p>
+    <ul id="grid" class="grid"></ul>
+  </main>
+
+  <footer class="wrap foot">
+    <span id="generated"></span>
+    <a id="repo-link" href="https://github.com/ishid4/Firefox-Zen-Mods">Source on GitHub</a>
+  </footer>
+
+  <template id="card">
+    <li class="card">
+      <div class="shot"><img alt="" loading="lazy"></div>
+      <div class="body">
+        <div class="title-row">
+          <h2 class="name"></h2>
+          <span class="version"></span>
+        </div>
+        <p class="author"></p>
+        <p class="desc"></p>
+        <div class="meta">
+          <span class="downloads" title="Downloads, all versions"></span>
+          <span class="badges"></span>
+        </div>
+        <div class="actions">
+          <a class="button primary download">Download</a>
+          <a class="button source">Source</a>
+        </div>
+      </div>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

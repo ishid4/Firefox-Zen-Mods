@@ -1,0 +1,37 @@
+name: Submit a mod
+description: Add a Firefox-Zen mod to the store, or a new version of one you submitted.
+title: "[Mod] "
+labels: [mod-submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Export your mod from Firefox: **Library → Mods →** your mod **→ Export…**. That makes a `.zip` with the mod's folder inside.
+
+        A bot checks the zip and opens a pull request. The mod is listed once a maintainer merges it.
+
+        - `mod.json` needs `name` and `version` (like `1.0.0`). For an update, raise `version`.
+        - The store sets `id`, `updateURL` and `downloadURL` for you, so installed copies update from here.
+        - Add a `preview.png` (or `.svg`, `.jpg`, `.webp`) so people can see what it does.
+  - type: textarea
+    id: zip
+    attributes:
+      label: Mod zip
+      description: Drag the .zip into this box (or click below it to attach). One mod per submission.
+      placeholder: Drop the .zip here
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What it does, or what changed in this version. Optional.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before you submit
+      options:
+        - label: I made this mod or have the right to share it.
+          required: true
+        - label: I understand that a mod with a script (mod.uc.js) is read line by line before it's listed, and can be turned down.
+          required: true

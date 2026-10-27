@@ -1,0 +1,23 @@
+# Checks the mods in every pull request, including ones opened by hand from
+# a fork. Read-only: it runs no code from the mods.
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: node scripts/check.mjs
+        env:
+          REPO: ${{ github.repository }}
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
