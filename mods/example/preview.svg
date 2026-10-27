@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <rect width="320" height="180" fill="#1c1a24"/>
+  <rect x="0" y="0" width="110" height="180" fill="#26232f"/>
+  <g font-family="system-ui, sans-serif" font-size="10" fill="#a19cb3">
+    <rect x="8" y="16" width="94" height="22" rx="6" fill="#2f2b3a"/>
+    <circle cx="20" cy="27" r="5" fill="#29c5f6"/>
+    <text x="31" y="31">Docs</text>
+    <rect x="8" y="44" width="94" height="22" rx="6" fill="#3a3550"/>
+    <rect x="8" y="46" width="3" height="18" rx="1.5" fill="#7c5cff"/>
+    <circle cx="20" cy="55" r="5" fill="#ff7a59"/>
+    <text x="31" y="59" fill="#eceaf3">Selected tab</text>
+    <rect x="8" y="72" width="94" height="22" rx="6" fill="#2f2b3a"/>
+    <circle cx="20" cy="83" r="5" fill="#5ad17b"/>
+    <text x="31" y="87">Mail</text>
+    <rect x="8" y="100" width="94" height="22" rx="6" fill="#2f2b3a"/>
+    <circle cx="20" cy="111" r="5" fill="#f6c429"/>
+    <text x="31" y="115">Music</text>
+  </g>
+  <rect x="122" y="16" width="186" height="148" rx="10" fill="#f6f5fa"/>
+  <rect x="138" y="34" width="110" height="10" rx="5" fill="#d9d4e8"/>
+  <rect x="138" y="54" width="150" height="6" rx="3" fill="#e6e2f0"/>
+  <rect x="138" y="66" width="140" height="6" rx="3" fill="#e6e2f0"/>
+  <rect x="138" y="78" width="120" height="6" rx="3" fill="#e6e2f0"/>
+  <rect x="226" y="132" width="70" height="22" rx="11" fill="#7c5cff"/>
+  <text x="261" y="147" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">Ctrl+Shift+D</text>
+</svg>
