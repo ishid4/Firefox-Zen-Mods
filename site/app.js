@@ -56,7 +56,7 @@ function installButton(mod, state) {
   button.className = "button primary grow";
   const have = state.installed?.[mod.id];
   if (state.busy === mod.id) {
-    button.textContent = have ? "Opening…" : "Installing…";
+    button.textContent = have ? "Opening Mods tab…" : "Installing…";
     button.disabled = true;
   } else if (!have) {
     button.textContent = "Install";
@@ -64,9 +64,9 @@ function installButton(mod, state) {
     button.textContent = `Update from ${have}`;
     button.title = "Review the update in the Library's Mods tab";
   } else {
-    button.textContent = "Installed";
-    button.classList.remove("primary");
-    button.title = "Open in the Library's Mods tab";
+    button.textContent = "✓ Installed";
+    button.classList.replace("primary", "installed");
+    button.title = "Installed. Click to open it in the Library's Mods tab";
   }
   button.addEventListener("click", () => {
     document.dispatchEvent(new CustomEvent("fz-store-install", { detail: mod.id, bubbles: true }));
