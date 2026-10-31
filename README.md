@@ -12,7 +12,7 @@ turn it on.
 Elsewhere (or without the store page):
 
 1. Click **Download** on the store page to get the mod's `.zip`.
-2. In Firefox, open the Library's **Mods** tab → **Install from zip…** and pick it.
+2. In Firefox, open the Library's **Mods** tab → **Install…** → **From Zip…** and pick it.
 
 Installed mods check this store for updates (Library → Mods → **Check for updates**).
 
