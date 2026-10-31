@@ -5,6 +5,12 @@ Browse them at **https://ishid4.github.io/Firefox-Zen-Mods/**.
 
 ## Install a mod
 
+In Firefox-Zen, click **Install** on the store page. Firefox asks before
+installing it; a mod with a script is installed off, and the Mods tab opens to
+turn it on.
+
+Elsewhere (or without the store page):
+
 1. Click **Download** on the store page to get the mod's `.zip`.
 2. In Firefox, open the Library's **Mods** tab → **Install from zip…** and pick it.
 
@@ -36,7 +42,7 @@ You can also open a pull request by hand that adds `mods/<id>/`; the
 | `.github/workflows/submission.yml` → `scripts/submission.mjs` | Downloads the zip from the issue, checks it, writes `mods/<id>/`, opens a PR and comments on the issue. Edit the issue to re-run. |
 | `.github/workflows/check.yml` → `scripts/check.mjs` | Checks every mod on each PR (version raised, store URLs, files, options). |
 | `.github/workflows/publish.yml` → `scripts/publish.mjs` | On push to `main` and hourly: zips each new version as `<id>-<version>.zip` in the `mods` release, then deploys the page with `index.json` and every `mods/<id>/mod.json`. |
-| `site/` | The store page (plain HTML/JS). |
+| `site/` | The store page (plain HTML/JS). In Firefox-Zen its FzStore actor marks `<html data-fz-mods>` with the installed mods, and **Install** sends it a `fz-store-install` event. |
 
 Download counts are GitHub's own counts for the release files, summed over
 every version (updates count too). Old versions stay in the release so counts
@@ -63,3 +69,6 @@ Preview the page locally (made-up download counts):
 LOCAL=1 REPO=ishid4/Firefox-Zen-Mods node scripts/publish.mjs
 npx serve _site
 ```
+
+To try **Install** against it in Firefox-Zen, set `firefox-zen.mods.store-dev`
+to `true` in about:config and restart.

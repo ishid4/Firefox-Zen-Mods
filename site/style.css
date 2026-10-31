@@ -101,9 +101,62 @@ h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
 .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 13px; }
 .downloads::before { content: "↓ "; }
 .badges { display: inline-flex; gap: 6px; }
-.badge { padding: 1px 8px; border-radius: 999px; background: var(--surface-2); font-size: 12px; font-weight: 600; color: var(--muted); }
+.badge { padding: 1px 8px; border-radius: 999px; border: 0; background: var(--surface-2); font: inherit; font-size: 12px; font-weight: 600; color: var(--muted); }
+
 .badge.warn { background: var(--warn-bg); color: var(--warn-text); }
 .actions { display: flex; gap: 8px; margin-top: 6px; }
-.actions .download { flex: 1; justify-content: center; }
+.actions { flex-wrap: wrap; }
+.actions .grow { flex: 1; justify-content: center; }
+
+/* The whole card opens the mod's popup: its name link covers it. */
+.card { position: relative; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+.card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.card:has(.open:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.open { color: inherit; text-decoration: none; }
+.open::after { content: ""; position: absolute; inset: 0; }
+.open:focus-visible { outline: none; }
+.card .desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+#detail {
+  width: min(640px, calc(100% - 32px)); max-height: calc(100% - 32px); padding: 0; overflow: auto;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
+}
+#detail .shot { aspect-ratio: 2 / 1; }
+#detail::backdrop { background: rgb(10 8 20 / 55%); backdrop-filter: blur(2px); }
+.close-row { position: sticky; top: 0; height: 0; display: flex; justify-content: flex-end; z-index: 1; }
+.close {
+  margin: 10px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+}
+.close svg { width: 14px; height: 14px; }
+.detail-body { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 20px; }
+.detail-body .name { font-size: 22px; }
+.detail-body h3 { margin: 6px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.detail-body h3 span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; font-size: 13px; }
+.facts div { display: flex; gap: 6px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; }
+.changes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.changes li {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  background: var(--surface-2); font-size: 13px; font-weight: 600;
+}
+.changes li span { font-weight: 400; color: var(--muted); }
+.changes li.warn { background: var(--warn-bg); color: var(--warn-text); }
+.changes li.warn span { color: inherit; opacity: 0.85; }
+.opts { width: 100%; border-collapse: collapse; font-size: 13px; }
+.opts th { text-align: left; font-weight: 600; color: var(--muted); padding: 0 8px 4px 0; border-bottom: 1px solid var(--line); }
+.opts td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.opts tr:last-child td { border-bottom: 0; }
+.opts td:first-child { font-weight: 600; }
+.opts td:not(:first-child) { color: var(--muted); }
+.opt-hint { display: block; font-weight: 400; color: var(--muted); }
+.opt-default { display: inline-flex; align-items: center; gap: 5px; }
+.swatch { width: 12px; height: 12px; border-radius: 4px; border: 1px solid var(--line); }
+.button:disabled { opacity: 0.6; cursor: default; }
+.error { margin: 0; color: var(--warn-text); font-size: 13px; overflow-wrap: anywhere; }
+.zen-only { display: none; }
+body.zen .zen-only { display: block; }
 
 .foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 32px; color: var(--muted); font-size: 13px; }

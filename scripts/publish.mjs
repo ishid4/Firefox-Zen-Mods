@@ -32,6 +32,22 @@ function releaseAssets() {
   return new Map(lines.split("\n").filter(Boolean).map(l => l.split("\t")).map(([n, c]) => [n, Number(c)]));
 }
 
+// What the store page shows of an option (see describe() in site/app.js).
+function storeOption(o) {
+  const str = v => (typeof v === "string" ? v.trim() : "");
+  const num = v => (Number.isFinite(v) ? v : null);
+  return {
+    type: o.type,
+    label: str(o.label) || o.pref,
+    hint: str(o.hint),
+    default: ["string", "number", "boolean"].includes(typeof o.default) ? o.default : null,
+    min: num(o.min),
+    max: num(o.max),
+    unit: str(o.unit),
+    choices: Array.isArray(o.choices) ? o.choices.map(c => ({ value: String(c?.value ?? ""), label: str(c?.label) })) : [],
+  };
+}
+
 // "<id>-<version>.zip" -> id (versions have no "-").
 function idOf(name) {
   const m = /^(.+)-([^-]+)\.zip$/.exec(name);
@@ -57,7 +73,7 @@ await mkdir(DIST);
 const list = [];
 for (const id of await modIds()) {
   const dir = join(MODS_DIR, id);
-  const { manifest, errors, hasScript, hasContentStyles, preview } = await checkMod(dir, id);
+  const { manifest, errors, hasStyles, hasScript, hasContentStyles, preview } = await checkMod(dir, id);
   if (errors.length) {
     console.log(`::warning::Skipping ${id}: ${errors.join(" ")}`);
     continue;
@@ -83,9 +99,10 @@ for (const id of await modIds()) {
     author: (manifest.author || owners[id]?.[0] || "").trim(),
     description: (manifest.description || "").trim(),
     homepage: manifest.homepage || null,
+    styles: !!hasStyles,
     script: hasScript,
     contentStyles: !!hasContentStyles,
-    options: Array.isArray(manifest.options) ? manifest.options.length : 0,
+    options: Array.isArray(manifest.options) ? manifest.options.map(storeOption) : [],
     preview: preview ? `${MODS_DIR}/${id}/${preview.split("/").pop()}` : null,
     download: storeURLs(REPO || "owner/repo", id, manifest.version).downloadURL,
     source: `https://github.com/${REPO}/tree/main/${MODS_DIR}/${id}`,

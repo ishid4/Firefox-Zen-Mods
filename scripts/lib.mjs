@@ -84,7 +84,7 @@ const isInside = rel =>
 const normalize = rel => rel.split(/[\\/]/).filter(Boolean).join("/");
 
 // Checks mods/<id> (or any folder holding a mod.json). Returns
-// { manifest, files, hasScript, preview, errors, warnings }.
+// { manifest, files, hasStyles, hasScript, hasContentStyles, preview, errors, warnings }.
 export async function checkMod(dir, id) {
   const errors = [];
   const warnings = [];
@@ -181,6 +181,7 @@ export async function checkMod(dir, id) {
   const contentStyles = resolveList("contentStyles");
   const script = resolveList("script", true);
   const preview = resolveList("preview", true);
+  result.hasStyles = styles.length > 0;
   result.hasScript = script.length > 0;
   result.hasContentStyles = contentStyles.length > 0;
   result.preview = preview[0] ?? null;
