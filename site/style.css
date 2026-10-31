@@ -128,6 +128,12 @@ h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
 }
 #detail .shot { aspect-ratio: 2 / 1; }
+/* Install / Download / Source stay in view while the popup scrolls. */
+.detail-foot {
+  position: sticky; bottom: 0; display: grid; gap: 6px; padding: 12px 20px 16px;
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.detail-foot .actions { margin-top: 0; }
 #detail::backdrop { background: rgb(10 8 20 / 55%); backdrop-filter: blur(2px); }
 .close-row { position: sticky; top: 0; height: 0; display: flex; justify-content: flex-end; z-index: 1; }
 .close {
