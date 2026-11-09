@@ -43,6 +43,7 @@ You can also open a pull request by hand that adds `mods/<id>/`; the
 | `.github/workflows/check.yml` → `scripts/check.mjs` | Checks every mod on each PR (version raised, store URLs, files, options). |
 | `.github/workflows/publish.yml` → `scripts/publish.mjs` | On push to `main` and hourly: zips each new version as `<id>-<version>.zip` in the `mods` release, then deploys the page with `index.json` and every `mods/<id>/mod.json`. |
 | `site/` | The store page (plain HTML/JS). In Firefox-Zen its FzStore actor marks `<html data-fz-mods>` with the installed mods, and **Install** sends it a `fz-store-install` event. |
+| `site/touch/` | The page a Firefox-Zen touch's share link opens (`/touch/#1.<touch>`; the touch never reaches the server). It shows the touch as text; in Firefox-Zen (`<html data-fz-touches>`, set by its FzTouch actor) **Try it** sends a `fz-touch-try` event, and Firefox-Zen decodes, cleans and previews the touch itself. |
 
 Download counts are GitHub's own counts for the release files, summed over
 every version (updates count too). Old versions stay in the release so counts

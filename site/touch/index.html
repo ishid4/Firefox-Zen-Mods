@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Firefox-Zen marks <html data-fz-touches> on this page (and only here),
+       so it can offer Try it. See JS/FzTouch/FzTouchChild.sys.mjs there. -->
+  <meta name="fz-touch-page">
+  <title>A Firefox-Zen touch</title>
+  <meta name="description" content="A touch for Firefox-Zen: someone's restyle of a website, to try in one click.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c5cff'/%3E%3Cpath d='M13 7c.6 5.3 3 7.7 8.3 8.3-5.3.6-7.7 3-8.3 8.3-.6-5.3-3-7.7-8.3-8.3 5.3-.6 7.7-3 8.3-8.3z' fill='white'/%3E%3C/svg%3E">
+  <style>
+    .touch { max-width: 760px; padding-block: 32px 64px; }
+    .card { padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .kicker { margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .card h2 { margin: 0; font-size: 26px; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+    .meta { margin: 6px 0 0; color: var(--muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .note { margin: 16px 0 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+    .edits { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .edits li { display: flex; justify-content: space-between; gap: 16px; padding: 8px 12px; }
+    .edits li + li { border-top: 1px solid var(--line); }
+    .edits code { overflow-wrap: anywhere; }
+    .edits span { flex: none; color: var(--muted); font-size: 14px; }
+    pre { margin: 0; padding: 14px 16px; overflow: auto; max-height: 420px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font: 13px/1.55 ui-monospace, "Cascadia Code", Consolas, monospace; }
+    .empty { color: var(--muted); }
+    .problem { padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-row">
+      <div>
+        <h1>Firefox-Zen Touches</h1>
+        <p class="lede">Restyles of websites, made in <a href="https://github.com/ishid4/Firefox-Zen">Firefox-Zen</a> and shared by link.</p>
+      </div>
+      <a class="button" href="../">Mods store</a>
+    </div>
+  </header>
+
+  <main class="wrap touch">
+    <div class="problem" id="problem" hidden>
+      <h2>This link has no touch in it</h2>
+      <p class="meta">It may have been cut short when it was copied. Ask for the link again, or for the touch as a file.</p>
+    </div>
+
+    <article id="touch" hidden>
+      <div class="card">
+        <p class="kicker">A touch for <span id="site"></span></p>
+        <h2 id="name"></h2>
+        <p class="meta" id="meta"></p>
+
+        <div class="actions zen" hidden>
+          <button class="button primary" id="try" type="button">Try it on <span id="try-site"></span></button>
+        </div>
+        <p class="note zen" hidden>It opens the site with the touch on, for this tab only. Keep it or discard it from the bar on top. Nothing in it can load from other sites.</p>
+
+        <div class="actions no-zen">
+          <a class="button primary" href="https://github.com/ishid4/Firefox-Zen">Get Firefox-Zen</a>
+          <button class="button" id="download" type="button">Download the touch</button>
+        </div>
+        <p class="note no-zen">Touches need <a href="https://github.com/ishid4/Firefox-Zen">Firefox-Zen</a>. With it, this page shows a Try it button; or import the downloaded file from the Library's Touches tab.</p>
+      </div>
+
+      <section class="section">
+        <h3>What it changes</h3>
+        <ul class="edits" id="edits"></ul>
+        <p class="empty" id="no-edits" hidden>No picked elements.</p>
+      </section>
+
+      <section class="section">
+        <h3>Its CSS</h3>
+        <pre id="css"></pre>
+      </section>
+    </article>
+  </main>
+
+  <script>
+    "use strict";
+    // The touch is in the #fragment ("#1.<deflated JSON, base64url>"), which
+    // never reaches the server. Everything from it is shown as text.
+    const $ = id => document.getElementById(id);
+
+    async function decode(hash) {
+      const m = /^#1\.([A-Za-z0-9_-]{8,})$/.exec(hash);
+      if (!m) {
+        return null;
+      }
+      const bytes = Uint8Array.from(atob(m[1].replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      const data = JSON.parse(await new Response(stream).text());
+      return data && data.format === "firefox-zen-touch" && data.scope ? data : null;
+    }
+
+    const scopeLabel = scope =>
+      scope.type === "domain" ? `all of ${scope.value}`
+      : scope.type === "host" ? `only ${scope.value}`
+      : String(scope.value).replace(/^https?:\/\//, "") + (String(scope.value).endsWith("/") ? "…" : "");
+    const siteName = scope => {
+      try {
+        return scope.type === "prefix" ? new URL(scope.value).hostname.replace(/^www\./, "") : scope.value;
+      } catch {
+        return String(scope.value);
+      }
+    };
+
+    function summary(e) {
+      if (e.hide) {
+        return "Hidden";
+      }
+      const s = e.style || {};
+      const parts = [];
+      if (s.color || s.background) parts.push("colors");
+      if (s.fontFamily || s.fontSize != null) parts.push("font");
+      if (s.maxWidth != null || s.padding != null) parts.push("size");
+      if (s.radius != null) parts.push("corners");
+      if (e.text != null) parts.push("text");
+      if (e.insert) parts.push("added HTML");
+      return parts.length ? parts.join(", ").replace(/^./, c => c.toUpperCase()) : "No changes";
+    }
+
+    function zen() {
+      const on = document.documentElement.hasAttribute("data-fz-touches");
+      for (const el of document.querySelectorAll(".zen")) el.hidden = !on;
+      for (const el of document.querySelectorAll(".no-zen")) el.hidden = on;
+    }
+
+    async function show() {
+      let data = null;
+      try {
+        data = await decode(location.hash);
+      } catch {}
+      $("problem").hidden = !!data;
+      $("touch").hidden = !data;
+      if (!data) {
+        return;
+      }
+      const site = siteName(data.scope);
+      document.title = `${data.name || "A touch"} · Firefox-Zen touch for ${site}`;
+      $("site").textContent = site;
+      $("try-site").textContent = site;
+      $("name").textContent = data.name || "Touch";
+      $("meta").textContent = [data.author ? `By ${data.author}` : null, `Applies to ${scopeLabel(data.scope)}`].filter(Boolean).join(" · ");
+      const edits = Array.isArray(data.edits) ? data.edits : [];
+      $("edits").replaceChildren(...edits.map(e => {
+        const li = document.createElement("li");
+        const code = document.createElement("code");
+        code.textContent = String(e.sel ?? "");
+        const what = document.createElement("span");
+        what.textContent = summary(e);
+        li.append(code, what);
+        return li;
+      }));
+      $("edits").hidden = !edits.length;
+      $("no-edits").hidden = !!edits.length;
+      $("css").textContent = String(data.css ?? "").trim() || "/* No CSS of its own */";
+      $("download").onclick = () => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+        a.download = `${(data.name || "touch").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-").toLowerCase() || "touch"}.touch.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      };
+    }
+
+    // Firefox-Zen takes it from here (FzTouch actor): it checks this is the
+    // store, decodes and cleans the touch itself, and opens the site.
+    $("try").addEventListener("click", () => {
+      // (It has to bubble: Firefox-Zen listens above the document.)
+      document.dispatchEvent(new CustomEvent("fz-touch-try", { detail: location.hash, bubbles: true }));
+    });
+    document.addEventListener("fz-touches-ready", zen);
+    window.addEventListener("hashchange", show);
+    zen();
+    show();
+  </script>
+</body>
+</html>
