@@ -1,0 +1,22 @@
+{
+  "format": "firefox-zen-touch",
+  "version": 1,
+  "name": "Twitch test",
+  "scope": {
+    "type": "domain",
+    "value": "twitch.tv"
+  },
+  "edits": [
+    {
+      "sel": "div[aria-label=\"LIRIK Viewers Also Watch\"]",
+      "hide": true,
+      "style": {}
+    }
+  ],
+  "css": "",
+  "id": 4,
+  "author": "ishid4",
+  "url": "https://github.com/ishid4/Firefox-Zen-Mods/issues/4",
+  "created": "2026-11-09T21:26:06Z",
+  "updated": "2026-11-09T21:26:15.734Z"
+}
