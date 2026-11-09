@@ -3,11 +3,18 @@
 // its download count) and mods/<id>/mod.json + preview, which installed
 // copies check for updates. Needs REPO and GH_TOKEN (for gh). LOCAL=1 skips
 // GitHub and makes up counts, to preview the site.
+//
+// Also the touches gallery: touches/<issue>.json (written by touches.mjs) go
+// to the site as is, with touches/index.json listing them all with their
+// likes (👍 on the issue; touches with many 👎, more than 👍, are left out).
+// Firefox-Zen downloads the whole index, so it never says which sites
+// someone visits.
 
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { MODS_DIR, RELEASE_TAG, VERSION_RE, assetName, checkMod, modIds, readOwners, storeURLs } from "./lib.mjs";
+import { TOUCHES_DIR, siteOf } from "./touch-lib.mjs";
 
 const { REPO = "", LOCAL } = process.env;
 const SITE = "_site";
@@ -127,5 +134,51 @@ if (LOCAL) {
 }
 
 await writeFile(join(SITE, "index.json"), JSON.stringify({ repo: REPO, generated: new Date().toISOString(), mods: list }));
+// ---- touches ----
+
+// Hidden once this many people 👎 it (and more than 👍 it).
+const HIDE_AT = 5;
+
+// Issue number -> { up, down } for every open touch issue.
+function touchReactions() {
+  const lines = gh("api", "--paginate", `repos/${REPO}/issues?labels=touch&state=open&per_page=100`,
+    "--jq", '.[] | [.number, .reactions["+1"], .reactions["-1"]] | @tsv');
+  return new Map(lines.split("\n").filter(Boolean).map(l => l.split("\t").map(Number)).map(([n, up, down]) => [n, { up, down }]));
+}
+
+const reactions = LOCAL ? null : touchReactions();
+const touches = [];
+await mkdir(join(SITE, TOUCHES_DIR), { recursive: true });
+for (const name of (await readdir(TOUCHES_DIR).catch(() => [])).filter(n => /^\d+\.json$/.test(n)).sort()) {
+  let t;
+  try {
+    t = JSON.parse(await readFile(join(TOUCHES_DIR, name), "utf8"));
+  } catch {
+    console.log(`::warning::Skipping ${name}: not JSON`);
+    continue;
+  }
+  const r = LOCAL ? { up: Math.floor(Math.random() * 40), down: 0 } : reactions.get(t.id);
+  // Closed (or relabeled) since it was written: touches.mjs removes it soon.
+  if (!r || (r.down >= HIDE_AT && r.down > r.up)) {
+    continue;
+  }
+  await writeFile(join(SITE, TOUCHES_DIR, name), JSON.stringify(t));
+  touches.push({
+    id: t.id,
+    name: t.name,
+    author: t.author,
+    scope: t.scope,
+    site: siteOf(t.scope),
+    elements: t.edits.length,
+    css: !!t.css.trim(),
+    likes: r.up,
+    url: t.url,
+    created: t.created,
+    updated: t.updated,
+  });
+}
+await writeFile(join(SITE, TOUCHES_DIR, "index.json"), JSON.stringify({ repo: REPO, generated: new Date().toISOString(), touches }));
+console.log(`Listed ${touches.length} touch(es).`);
+
 await writeFile(join(SITE, ".nojekyll"), "");
 console.log(`Listed ${list.length} mod(s).`);

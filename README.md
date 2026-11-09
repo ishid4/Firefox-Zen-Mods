@@ -44,6 +44,8 @@ You can also open a pull request by hand that adds `mods/<id>/`; the
 | `.github/workflows/publish.yml` → `scripts/publish.mjs` | On push to `main` and hourly: zips each new version as `<id>-<version>.zip` in the `mods` release, then deploys the page with `index.json` and every `mods/<id>/mod.json`. |
 | `site/` | The store page (plain HTML/JS). In Firefox-Zen its FzStore actor marks `<html data-fz-mods>` with the installed mods, and **Install** sends it a `fz-store-install` event. |
 | `site/touch/` | The page a Firefox-Zen touch's share link opens (`/touch/#1.<touch>`; the touch never reaches the server). It shows the touch as text; in Firefox-Zen (`<html data-fz-touches>`, set by its FzTouch actor) **Try it** sends a `fz-touch-try` event, and Firefox-Zen decodes, cleans and previews the touch itself. |
+| `.github/workflows/touches.yml` → `scripts/touches.mjs` | Touches published from Firefox-Zen: each is an issue with the touch in it. Checked on open/edit (`scripts/touch-lib.mjs`), written to `touches/<issue>.json` and committed to `main` directly (no pull request), then Publish runs. Rejected ones get a comment saying what to fix; closing the issue removes the touch. |
+| `touches/` | The listed touches. Publish copies them to the site with `touches/index.json` (every touch with its likes: 👍 on its issue; ones with 5+ 👎, more than 👍, are left out). Firefox-Zen downloads the whole index, at most hourly. |
 
 Download counts are GitHub's own counts for the release files, summed over
 every version (updates count too). Old versions stay in the release so counts
@@ -52,6 +54,29 @@ never reset; delete an asset by hand to drop it.
 Each mod's `updateURL` is its `mod.json` on the Pages site, which is deployed
 after its zip is uploaded, so an update is never announced before it can be
 downloaded.
+
+## Setting up the touches gallery
+
+Once, so Firefox-Zen can publish touches and like them (browsing the
+gallery works without it):
+
+1. On GitHub: **Settings → Developer settings → GitHub Apps → New GitHub App**.
+   - Name: e.g. *Firefox-Zen Touches*; Homepage URL: this repository.
+   - **Webhook**: untick *Active*.
+   - Tick **Enable Device Flow**. No callback URL is needed.
+   - Untick **Expire user authorization tokens** (Firefox-Zen has no client
+     secret to refresh them with; people would have to sign in again daily).
+   - **Repository permissions → Issues: Read and write**. Nothing else.
+   - *Where can this GitHub App be installed?* Only on this account.
+2. Create it, then **Install App** → this repository only.
+3. Copy the app's **Client ID** into `CLIENT_ID` in Firefox-Zen's
+   `JS/firefox-zen-touches-gallery.sys.mjs` and release Firefox-Zen.
+
+Signing in gives Firefox-Zen a token that can only do what the app may:
+issues (and their 👍) on this repository, as the person who signed in.
+
+If `main` is protected by a rule that requires pull requests, let
+`github-actions[bot]` bypass it, or the Touches workflow can't commit.
 
 ## Setting up the repository
 
